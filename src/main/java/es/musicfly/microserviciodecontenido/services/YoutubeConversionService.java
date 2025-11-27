@@ -79,6 +79,40 @@ public class YoutubeConversionService {
         return mp3Data;
     }
 
+    public File convertToMp3File(Song song, boolean preview) throws IOException, InterruptedException {
+        if (!pythonAvailable) throw new IllegalStateException("Python o yt-dlp no están disponibles");
+
+        File tempDir = new File(TEMP_DIR);
+        if (!tempDir.exists()) tempDir.mkdirs();
+
+        String outputFile = TEMP_DIR + "/song_" + System.currentTimeMillis() + ".mp3";
+
+        String ytDlpPath = getYtDlpPath();
+
+        ProcessBuilder pb = new ProcessBuilder(
+                ytDlpPath,
+                "-x",
+                "--audio-format", "mp3",
+                "--postprocessor-args", "-ar 44100 -ac 2 -b:a 192k",
+                "--postprocessor-args", "ExtractAudio+ffmpeg:-t 30",
+                "-o", outputFile,
+                song.getUrl()
+        );
+
+        pb.inheritIO();
+        Process process = pb.start();
+        int exitCode = process.waitFor();
+
+        File outputFileFile = new File(outputFile);
+
+        if (exitCode != 0) {
+            throw new RuntimeException("Error al convertir video de YouTube con yt-dlp");
+        }
+
+        return outputFileFile;
+    }
+
+
     // --------------------------
     // Métodos privados
     // --------------------------
