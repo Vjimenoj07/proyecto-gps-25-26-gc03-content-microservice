@@ -17,6 +17,11 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.Parameter;
+
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -125,6 +130,12 @@ public class SongController {
     }
 
     // Descargas de canciones
+    @Operation(summary = "Descargar canción",
+            description = "Convierte el contenido de YouTube a MP3 y devuelve el archivo para descarga directa.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Descarga generada correctamente"),
+            @ApiResponse(responseCode = "404", description = "Canción no encontrada")
+    })
 
     @GetMapping("/{id}/download")
     public ResponseEntity<byte[]> downloadSong(@PathVariable Long id) throws IOException, InterruptedException {
@@ -138,6 +149,13 @@ public class SongController {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(mp3Data);
     }
+
+    @Operation(summary = "Reproducir preview de la canción",
+            description = "Devuelve un fragmento o versión corta en MP3 y registra la visualización para estadísticas.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Preview generada correctamente"),
+            @ApiResponse(responseCode = "404", description = "Canción no encontrada")
+    })
 
     @GetMapping("/{id}/preview")
     public ResponseEntity<byte[]> previewSong(@PathVariable Long id, HttpServletRequest allRequest) throws IOException, InterruptedException {
