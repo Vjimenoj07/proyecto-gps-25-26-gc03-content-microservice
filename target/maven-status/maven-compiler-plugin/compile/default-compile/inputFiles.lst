@@ -1,0 +1,13 @@
+/Users/samuelsotoparedes/IdeaProjects/Microservicio de contenido/src/main/java/es/musicfly/microserviciodecontenido/MicroservicioDeContenidoApplication.java
+/Users/samuelsotoparedes/IdeaProjects/Microservicio de contenido/src/main/java/es/musicfly/microserviciodecontenido/controllers/AlbumController.java
+/Users/samuelsotoparedes/IdeaProjects/Microservicio de contenido/src/main/java/es/musicfly/microserviciodecontenido/controllers/SongController.java
+/Users/samuelsotoparedes/IdeaProjects/Microservicio de contenido/src/main/java/es/musicfly/microserviciodecontenido/models/DAO/Album.java
+/Users/samuelsotoparedes/IdeaProjects/Microservicio de contenido/src/main/java/es/musicfly/microserviciodecontenido/models/DAO/Genre.java
+/Users/samuelsotoparedes/IdeaProjects/Microservicio de contenido/src/main/java/es/musicfly/microserviciodecontenido/models/DAO/Song.java
+/Users/samuelsotoparedes/IdeaProjects/Microservicio de contenido/src/main/java/es/musicfly/microserviciodecontenido/repositories/AlbumRepository.java
+/Users/samuelsotoparedes/IdeaProjects/Microservicio de contenido/src/main/java/es/musicfly/microserviciodecontenido/repositories/SongRepository.java
+/Users/samuelsotoparedes/IdeaProjects/Microservicio de contenido/src/main/java/es/musicfly/microserviciodecontenido/services/AlbumService.java
+/Users/samuelsotoparedes/IdeaProjects/Microservicio de contenido/src/main/java/es/musicfly/microserviciodecontenido/services/SongService.java
+/Users/samuelsotoparedes/IdeaProjects/Microservicio de contenido/src/main/java/es/musicfly/microserviciodecontenido/services/YoutubeConversionService.java
+/Users/samuelsotoparedes/IdeaProjects/Microservicio de contenido/src/main/java/es/musicfly/microserviciodecontenido/views/DTO/AlbumDTO.java
+/Users/samuelsotoparedes/IdeaProjects/Microservicio de contenido/src/main/java/es/musicfly/microserviciodecontenido/views/DTO/SongDTO.java
