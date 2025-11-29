@@ -60,7 +60,6 @@ public class SongController {
                     )
             )
     })
-    @GetMapping
     public ResponseEntity<List<SongDTO>> getAllSongs() {
         Optional<List<Song>> song = Optional.of(songService.getAllSongs());
         Optional<List<SongDTO>> songs = Optional.of(new ArrayList<>());
@@ -97,7 +96,6 @@ public class SongController {
                     description = "La canción no fue encontrada"
             )
     })
-    @GetMapping("/{id}")
     public ResponseEntity<SongDTO> getSongById(@PathVariable Long id) {
         Optional<Song> song = songService.getSongById(id);
         return Optional.of(SongDTO.builder()

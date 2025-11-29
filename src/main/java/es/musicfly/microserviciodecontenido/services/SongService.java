@@ -6,8 +6,10 @@ import es.musicfly.microserviciodecontenido.repositories.AlbumRepository;
 import es.musicfly.microserviciodecontenido.repositories.SongRepository;
 import es.musicfly.microserviciodecontenido.views.DTO.SongDTO;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,15 +21,33 @@ public class SongService {
     private final SongRepository songRepository;
     private final AlbumRepository albumRepository;
 
+    @Operation(
+            summary = "Obtener todas las canciones",
+            description = "Recupera una lista de todas las canciones almacenadas en la base de datos."
+    )
     public List<Song> getAllSongs() {
         return songRepository.findAll();
     }
 
-    public Optional<Song> getSongById(Long id) {
+    @Operation(
+            summary = "Obtener una canción por ID",
+            description = "Busca y devuelve una canción utilizando su identificador."
+    )
+    public Optional<Song> getSongById(
+            @Schema(description = "ID de la canción a buscar", example = "10")
+            Long id
+    ) {
         return songRepository.findById(id);
     }
 
-    public Song createSong(SongDTO songDTO) {
+    @Operation(
+            summary = "Crear una nueva canción",
+            description = "Crea y guarda una nueva canción utilizando los datos proporcionados en el DTO."
+    )
+    public Song createSong(
+            @Schema(description = "DTO con los datos de la nueva canción")
+            SongDTO songDTO
+    ) {
         Song song = new Song();
         song.setNombre(songDTO.getNombre());
         song.setDuracion(songDTO.getDuracion());
@@ -45,7 +65,17 @@ public class SongService {
         return songRepository.save(song);
     }
 
-    public Song updateSong(Long id, SongDTO songDTO) {
+    @Operation(
+            summary = "Actualizar una canción",
+            description = "Actualiza los datos de una canción existente utilizando su ID y un DTO."
+    )
+    public Song updateSong(
+            @Schema(description = "ID de la canción a actualizar", example = "7")
+            Long id,
+
+            @Schema(description = "DTO con los datos actualizados de la canción")
+            SongDTO songDTO
+    ) {
         Song song = songRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Song not found with id " + id));
 
@@ -65,7 +95,14 @@ public class SongService {
         return songRepository.save(song);
     }
 
-    public void deleteSong(Long id) {
+    @Operation(
+            summary = "Eliminar una canción",
+            description = "Elimina una canción existente utilizando su ID."
+    )
+    public void deleteSong(
+            @Schema(description = "ID de la canción a eliminar", example = "4")
+            Long id
+    ) {
         songRepository.deleteById(id);
     }
 }
