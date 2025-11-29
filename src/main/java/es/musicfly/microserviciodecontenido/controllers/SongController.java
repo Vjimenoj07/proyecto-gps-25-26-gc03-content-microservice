@@ -113,28 +113,78 @@ public class SongController {
 
 
     @PostMapping
-    public Song createSong(@RequestBody SongDTO song) {
+    @Operation(
+            summary = "Crear una nueva canción",
+            description = "Crea una canción a partir de los datos enviados en el cuerpo de la petición."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Canción creada correctamente",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Song.class))),
+            @ApiResponse(responseCode = "400", description = "Datos inválidos en la solicitud")
+    })
+    public Song createSong(
+            @Parameter(description = "Datos de la nueva canción")
+            @RequestBody SongDTO song
+    ) {
         return songService.createSong(song);
     }
 
     @PutMapping("/{id}")
-    public Song updateSong(@PathVariable Long id, @RequestBody SongDTO song) {
+    @Operation(
+            summary = "Actualizar canción",
+            description = "Actualiza una canción existente mediante su ID."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Canción actualizada correctamente",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Song.class))),
+            @ApiResponse(responseCode = "404", description = "Canción no encontrada")
+    })
+    public Song updateSong(
+            @Parameter(description = "ID de la canción a actualizar", example = "10")
+            @PathVariable Long id,
+            @Parameter(description = "Nuevos datos de la canción")
+            @RequestBody SongDTO song
+    ) {
         return songService.updateSong(id, song);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSong(@PathVariable Long id) {
+    @Operation(
+            summary = "Eliminar canción",
+            description = "Elimina una canción existente mediante su ID."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Canción eliminada correctamente"),
+            @ApiResponse(responseCode = "404", description = "Canción no encontrada")
+    })
+    public ResponseEntity<Void> deleteSong(
+            @Parameter(description = "ID de la canción a eliminar", example = "10")
+            @PathVariable Long id
+    ) {
         songService.deleteSong(id);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/favorite")
-    public ResponseEntity<Void>  favoriteSong(@PathVariable Long id, HttpServletRequest allRequest){
-        try{
+    @Operation(
+            summary = "Marcar canción como favorita",
+            description = "Asocia una canción como favorita al usuario extraído de la cookie 'idUsuario'."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Canción marcada como favorita"),
+            @ApiResponse(responseCode = "404", description = "Canción no encontrada")
+    })
+    public ResponseEntity<Void> favoriteSong(
+            @Parameter(description = "ID de la canción a marcar como favorita", example = "10")
+            @PathVariable Long id,
+            HttpServletRequest allRequest
+    ) {
+        try {
             songService.getSongById(id)
                     .orElseThrow(() -> new RuntimeException("Song not found"));
-
-        }catch (RuntimeException e){
+        } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
 
@@ -152,7 +202,7 @@ public class SongController {
         estadisticasProducer.enviarFavorito(FavoritosDTO.builder()
                 .idContenido(id)
                 .idPerfil(idUsuario)
-                .idFavorito(idUsuario+"-"+id)
+                .idFavorito(idUsuario + "-" + id)
                 .accion("CREATED")
                 .fechaAgregado(LocalDate.now().toString())
                 .build());
@@ -161,12 +211,26 @@ public class SongController {
     }
 
     @PostMapping("/{id}/rating")
-    public ResponseEntity<Void>  ratingSong(@PathVariable Long id,@RequestBody Integer rate, HttpServletRequest allRequest){
-        try{
+    @Operation(
+            summary = "Enviar rating de una canción",
+            description = "Registra un rating para una canción asociado al usuario en la cookie 'idUsuario'."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Rating registrado correctamente"),
+            @ApiResponse(responseCode = "404", description = "Canción no encontrada"),
+            @ApiResponse(responseCode = "400", description = "Valor de rating inválido")
+    })
+    public ResponseEntity<Void> ratingSong(
+            @Parameter(description = "ID de la canción a puntuar", example = "10")
+            @PathVariable Long id,
+            @Parameter(description = "Valor del rating (1-5)", example = "5")
+            @RequestBody Integer rate,
+            HttpServletRequest allRequest
+    ) {
+        try {
             songService.getSongById(id)
                     .orElseThrow(() -> new RuntimeException("Song not found"));
-
-        }catch (RuntimeException e){
+        } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
 
@@ -184,21 +248,14 @@ public class SongController {
         estadisticasProducer.enviarRating(RatingDTO.builder()
                 .idContenido(id)
                 .idPerfil(idUsuario)
-                .idRating(idUsuario+"-"+id)
+                .idRating(idUsuario + "-" + id)
                 .accion("CREATED")
                 .rating(rate)
                 .build());
 
         return ResponseEntity.ok().build();
     }
-
     // Descargas de canciones
-    @Operation(summary = "Descargar canción",
-            description = "Convierte el contenido de YouTube a MP3 y devuelve el archivo para descarga directa.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Descarga generada correctamente"),
-            @ApiResponse(responseCode = "404", description = "Canción no encontrada")
-    })
 
     @GetMapping("/{id}/download")
     public ResponseEntity<byte[]> downloadSong(@PathVariable Long id) throws IOException, InterruptedException {
@@ -212,13 +269,6 @@ public class SongController {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(mp3Data);
     }
-
-    @Operation(summary = "Reproducir preview de la canción",
-            description = "Devuelve un fragmento o versión corta en MP3 y registra la visualización para estadísticas.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Preview generada correctamente"),
-            @ApiResponse(responseCode = "404", description = "Canción no encontrada")
-    })
 
     @GetMapping("/{id}/preview")
     public ResponseEntity<byte[]> previewSong(@PathVariable Long id, HttpServletRequest allRequest) throws IOException, InterruptedException {

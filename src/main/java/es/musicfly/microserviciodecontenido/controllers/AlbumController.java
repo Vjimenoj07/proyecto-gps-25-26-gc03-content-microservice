@@ -71,17 +71,78 @@ public class AlbumController {
 
 
     @PostMapping
-    public Album createAlbum(@RequestBody AlbumDTO albumDTO) {
+    @Operation(
+            summary = "Crear un nuevo álbum",
+            description = "Crea un nuevo álbum en el sistema usando los datos proporcionados."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Álbum creado correctamente",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Album.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Datos inválidos enviados en la petición"
+            )
+    })
+    public Album createAlbum(
+            @Parameter(description = "Datos del álbum a crear")
+            @RequestBody AlbumDTO albumDTO
+    ) {
         return albumService.createAlbum(albumDTO);
     }
 
     @PutMapping("/{id}")
-    public Album updateAlbum(@PathVariable Long id, @RequestBody AlbumDTO albumDTO) {
+    @Operation(
+            summary = "Actualizar un álbum existente",
+            description = "Actualiza los datos de un álbum mediante su ID."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Álbum actualizado correctamente",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Album.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "No se encontró el álbum a actualizar"
+            )
+    })
+    public Album updateAlbum(
+            @Parameter(description = "ID del álbum a actualizar", example = "5")
+            @PathVariable Long id,
+            @Parameter(description = "Nuevos datos del álbum")
+            @RequestBody AlbumDTO albumDTO
+    ) {
         return albumService.updateAlbum(id, albumDTO);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAlbum(@PathVariable Long id) {
+    @Operation(
+            summary = "Eliminar un álbum",
+            description = "Elimina un álbum de la base de datos mediante su ID."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Álbum eliminado correctamente"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "No se encontró el álbum a eliminar"
+            )
+    })
+    public ResponseEntity<Void> deleteAlbum(
+            @Parameter(description = "ID del álbum a eliminar", example = "5")
+            @PathVariable Long id
+    ) {
         albumService.deleteAlbum(id);
         return ResponseEntity.noContent().build();
     }
