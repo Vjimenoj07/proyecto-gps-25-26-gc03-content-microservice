@@ -8,6 +8,8 @@ import es.musicfly.microserviciodecontenido.views.DTO.FavoritosDTO;
 import es.musicfly.microserviciodecontenido.views.DTO.RatingDTO;
 import es.musicfly.microserviciodecontenido.views.DTO.SongDTO;
 import es.musicfly.microserviciodecontenido.views.DTO.VisualizacionDTO;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,11 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.Parameter;
+
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,6 +46,21 @@ public class SongController {
     private final EstadisticasProducer estadisticasProducer;
 
     @GetMapping
+    @Operation(
+            summary = "Obtener todas las canciones",
+            description = "Devuelve una lista completa de todas las canciones registradas."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Listado de canciones obtenido correctamente",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Song.class)
+                    )
+            )
+    })
+    @GetMapping
     public ResponseEntity<List<SongDTO>> getAllSongs() {
         Optional<List<Song>> song = Optional.of(songService.getAllSongs());
         Optional<List<SongDTO>> songs = Optional.of(new ArrayList<>());
@@ -57,6 +79,25 @@ public class SongController {
     }
 
     @GetMapping("/{id}")
+    @Operation(
+            summary = "Obtener una canción por ID",
+            description = "Devuelve una canción específica si existe en la base de datos."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Canción encontrada",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Song.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "La canción no fue encontrada"
+            )
+    })
+    @GetMapping("/{id}")
     public ResponseEntity<SongDTO> getSongById(@PathVariable Long id) {
         Optional<Song> song = songService.getSongById(id);
         return Optional.of(SongDTO.builder()
@@ -71,6 +112,7 @@ public class SongController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
 
     @PostMapping
     public Song createSong(@RequestBody SongDTO song) {
@@ -153,6 +195,12 @@ public class SongController {
     }
 
     // Descargas de canciones
+    @Operation(summary = "Descargar canción",
+            description = "Convierte el contenido de YouTube a MP3 y devuelve el archivo para descarga directa.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Descarga generada correctamente"),
+            @ApiResponse(responseCode = "404", description = "Canción no encontrada")
+    })
 
     @GetMapping("/{id}/download")
     public ResponseEntity<byte[]> downloadSong(@PathVariable Long id) throws IOException, InterruptedException {
@@ -166,6 +214,13 @@ public class SongController {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(mp3Data);
     }
+
+    @Operation(summary = "Reproducir preview de la canción",
+            description = "Devuelve un fragmento o versión corta en MP3 y registra la visualización para estadísticas.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Preview generada correctamente"),
+            @ApiResponse(responseCode = "404", description = "Canción no encontrada")
+    })
 
     @GetMapping("/{id}/preview")
     public ResponseEntity<byte[]> previewSong(@PathVariable Long id, HttpServletRequest allRequest) throws IOException, InterruptedException {
