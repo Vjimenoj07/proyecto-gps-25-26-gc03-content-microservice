@@ -8,6 +8,8 @@ import es.musicfly.microserviciodecontenido.views.DTO.FavoritosDTO;
 import es.musicfly.microserviciodecontenido.views.DTO.RatingDTO;
 import es.musicfly.microserviciodecontenido.views.DTO.SongDTO;
 import es.musicfly.microserviciodecontenido.views.DTO.VisualizacionDTO;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -38,16 +40,52 @@ public class SongController {
     private final EstadisticasProducer estadisticasProducer;
 
     @GetMapping
+    @Operation(
+            summary = "Obtener todas las canciones",
+            description = "Devuelve una lista completa de todas las canciones registradas."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Listado de canciones obtenido correctamente",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Song.class)
+                    )
+            )
+    })
     public List<Song> getAllSongs() {
         return songService.getAllSongs();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Song> getSongById(@PathVariable Long id) {
+    @Operation(
+            summary = "Obtener una canción por ID",
+            description = "Devuelve una canción específica si existe en la base de datos."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Canción encontrada",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = Song.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "La canción no fue encontrada"
+            )
+    })
+    public ResponseEntity<Song> getSongById(
+            @Parameter(description = "ID de la canción a consultar", example = "10")
+            @PathVariable Long id
+    ) {
         return songService.getSongById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
 
     @PostMapping
     public Song createSong(@RequestBody SongDTO song) {
