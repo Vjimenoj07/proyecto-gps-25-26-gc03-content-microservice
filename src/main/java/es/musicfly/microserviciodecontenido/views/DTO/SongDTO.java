@@ -2,11 +2,16 @@ package es.musicfly.microserviciodecontenido.views.DTO;
 
 import es.musicfly.microserviciodecontenido.models.DAO.Genre;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 @Schema(description = "Objeto de transferencia para crear o actualizar una canción")
 public class SongDTO {
+
+    @Schema(description = "Id de la canción", example = "1")
+    private Long idCancion;
 
     @Schema(description = "Nombre de la canción", example = "Bohemian Rhapsody")
     private String nombre;

@@ -14,6 +14,8 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
@@ -25,10 +27,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.Parameter;
 
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/songs")
@@ -54,8 +60,22 @@ public class SongController {
                     )
             )
     })
-    public List<Song> getAllSongs() {
-        return songService.getAllSongs();
+    @GetMapping
+    public ResponseEntity<List<SongDTO>> getAllSongs() {
+        Optional<List<Song>> song = Optional.of(songService.getAllSongs());
+        Optional<List<SongDTO>> songs = Optional.of(new ArrayList<>());
+        song.get().forEach(song1 -> {
+            songs.get().add(SongDTO.builder()
+                    .idCancion(song1.getId())
+                    .idArtista(song1.getIdArtista())
+                    .url(song1.getUrl())
+                    .urlPortada(song1.getUrlPortada())
+                    .nombre(song1.getNombre())
+                    .duracion(song1.getDuracion())
+                    .albumId(0L)
+                    .build());
+        });
+        return songs.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{id}")
@@ -77,11 +97,18 @@ public class SongController {
                     description = "La canción no fue encontrada"
             )
     })
-    public ResponseEntity<Song> getSongById(
-            @Parameter(description = "ID de la canción a consultar", example = "10")
-            @PathVariable Long id
-    ) {
-        return songService.getSongById(id)
+    @GetMapping("/{id}")
+    public ResponseEntity<SongDTO> getSongById(@PathVariable Long id) {
+        Optional<Song> song = songService.getSongById(id);
+        return Optional.of(SongDTO.builder()
+                        .idCancion(song.get().getId())
+                        .idArtista(song.get().getIdArtista())
+                        .url(song.get().getUrl())
+                        .urlPortada(song.get().getUrlPortada())
+                        .nombre(song.get().getNombre())
+                        .duracion(song.get().getDuracion())
+                        .albumId(0L)
+                        .build())
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -228,4 +255,16 @@ public class SongController {
                 .body(mp3Data);
     }
 
+    @GetMapping("/{id}/stream")
+    public ResponseEntity<Resource> streamSong(@PathVariable Long id) throws IOException, InterruptedException {
+        Song song = songService.getSongById(id).orElseThrow();
+        File mp3File = youtubeConversionService.convertToMp3File(song, false);
+
+        InputStreamResource resource = new InputStreamResource(new FileInputStream(mp3File));
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("audio/mpeg"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + mp3File.getName() + "\"")
+                .body(resource);
+    }
 }
