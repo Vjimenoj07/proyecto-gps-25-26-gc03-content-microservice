@@ -1,1 +1,1 @@
-# proyecto-gps-25-26-gc03-content-microservice-sonarcube2
+# proyecto-gps-25-26-gc03-content-microservice-sonarcube
