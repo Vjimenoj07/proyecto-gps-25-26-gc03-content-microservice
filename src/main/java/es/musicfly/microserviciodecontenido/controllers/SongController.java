@@ -41,6 +41,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SongController {
 
+    private final String songNotFound= "Song not found";
+
     private final SongService songService;
     private final YoutubeConversionService youtubeConversionService;
     private final EstadisticasProducer estadisticasProducer;
@@ -183,7 +185,7 @@ public class SongController {
     ) {
         try {
             songService.getSongById(id)
-                    .orElseThrow(() -> new RuntimeException("Song not found"));
+                    .orElseThrow(() -> new RuntimeException(songNotFound));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
@@ -229,7 +231,7 @@ public class SongController {
     ) {
         try {
             songService.getSongById(id)
-                    .orElseThrow(() -> new RuntimeException("Song not found"));
+                    .orElseThrow(() -> new RuntimeException(songNotFound));
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
@@ -260,7 +262,7 @@ public class SongController {
     @GetMapping("/{id}/download")
     public ResponseEntity<byte[]> downloadSong(@PathVariable Long id) throws IOException, InterruptedException {
         Song song = songService.getSongById(id)
-                .orElseThrow(() -> new RuntimeException("Song not found"));
+                .orElseThrow(() -> new RuntimeException(songNotFound));
 
         byte[] mp3Data = youtubeConversionService.convertToMp3(song,false);
 
@@ -273,7 +275,7 @@ public class SongController {
     @GetMapping("/{id}/preview")
     public ResponseEntity<byte[]> previewSong(@PathVariable Long id, HttpServletRequest allRequest) throws IOException, InterruptedException {
         Song song = songService.getSongById(id)
-                .orElseThrow(() -> new RuntimeException("Song not found"));
+                .orElseThrow(() -> new RuntimeException(songNotFound));
 
         Long idUsuario = 0L;
 

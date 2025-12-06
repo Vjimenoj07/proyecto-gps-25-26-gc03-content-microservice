@@ -27,16 +27,14 @@ public class AlbumController {
             summary = "Obtener todos los álbumes",
             description = "Devuelve una lista completa de todos los álbumes registrados."
     )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Listado de álbumes obtenido correctamente",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = Album.class)
-                    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Listado de álbumes obtenido correctamente",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Album.class)
             )
-    })
+    )
     public List<Album> getAllAlbums() {
         return albumService.getAllAlbums();
     }

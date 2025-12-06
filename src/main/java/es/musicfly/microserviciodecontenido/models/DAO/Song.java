@@ -2,7 +2,6 @@ package es.musicfly.microserviciodecontenido.models.DAO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
-import jakarta.ws.rs.core.UriBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
